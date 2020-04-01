@@ -8,28 +8,34 @@ describe('auth routes', () => {
     return request(app)
       .post('/api/v1/auth/signup')
       .send({
-        email: 'spot@dogs.com',
-        password: 'spotWasHere'
+        username: 'jimmy',
+        password: 'jimmywashere',
+        profilePhotoUrl: 'www.url.com'
       })
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.any(String),
-          email: 'spot@dogs.com',
+          username: 'jimmy',
+          profilePhotoUrl: 'www.url.com',
           __v: 0
         });
       });
   });
+
   it('logs in a user', async() => {
+    const user = await getUser({ username: 'jimmy' });
     return request(app)
       .post('/api/v1/auth/login')
       .send({
-        email: 'test@test.com',
-        password: 'password'
+        username: user.username,
+        password: 'jimmywashere',
+        profilePhotoUrl: 'www.url.com'
       })
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.any(String),
-          email: 'test@test.com',
+          username: 'jimmy',
+          profilePhotoUrl: 'www.url.com',
           __v: 0
         });
       });
@@ -41,7 +47,8 @@ describe('auth routes', () => {
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.any(String),
-          email: 'test@test.com',
+          username: 'jimmy',
+          profilePhotoUrl: 'www.url.com',
           __v: 0
         });
       });

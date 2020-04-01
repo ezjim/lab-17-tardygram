@@ -1,21 +1,31 @@
 const chance = require('chance').Chance();
 const User = require('../lib/models/User');
-const Note = require('../lib/models/Note');
+const Insta = require('../lib/models/Insta');
+const Comment = require('../lib/models/Comment');
 
-module.exports = async({ usersToCreate = 5, notesToCreate = 100 } = {}) => {
+module.exports = async({ usersToCreate = 5, instaToCreate = 50,  commentsToCreate = 150 } = {}) => {
   const loggedInUser = await User.create({
-    email: 'test@test.com',
-    password: 'password'
+    username: 'jimmy',
+    password: 'jimmywashere',
+    profilePhotoUrl: 'www.url.com'
   });
 
   const users = await User.create([...Array(usersToCreate)].slice(1).map(() => ({
-    email: chance.email(),
-    password: chance.animal()
+    username: chance.email(),
+    password: chance.word(),
+    profilePhotoUrl: chance.url()
   })));
 
-  await Note.create([...Array(notesToCreate)].map(() => ({
-    title: chance.profession(),
-    body: chance.sentence(),
-    author: chance.weighted([loggedInUser, ...users], [2, ...users.map(() => 1)])._id
+  const insta = await Insta.create([...Array(instaToCreate)].map(() => ({
+    user: chance.weighted([loggedInUser, ...users], [2, ...users.map(() => 1)])._id,
+    photoUrl: chance.url(),
+    caption: chance.sentence(),
+    tags: [...Array(10)].map(() => (chance.hashtag()))
+  })));
+
+  await Comment.create([...Array(commentsToCreate)].map(() => ({
+    commentBy: chance.pickone(users),
+    post: chance.pickone(insta),
+    comment: chance.sentence()
   })));
 };
